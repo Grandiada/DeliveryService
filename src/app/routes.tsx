@@ -4,10 +4,8 @@ import { Redirect, Route, Switch } from 'react-router-dom';
 
 import { ConnectedRouter } from 'connected-react-router';
 
-import ErrorBoundary from '../common/components/ErrorBoundary/ErrorBoundary';
-
 export enum MenuItems {
-  Minesweaper = '/minesweaper',
+  GraphManager = '/graph-manager',
 }
 
 export interface IRoute {
@@ -16,13 +14,13 @@ export interface IRoute {
   exact: boolean;
 }
 
-const defaultPath = MenuItems.Minesweaper;
+const defaultPath = MenuItems.GraphManager;
 
 const routes: IRoute[] = [
   {
-    component: lazy(() => import(/* webpackChunkName: "Minesweaper" */ '../features/Minesweaper')),
+    component: lazy(() => import(/* webpackChunkName: "GraphManager" */ '../features/GraphManager')),
     exact: true,
-    path: MenuItems.Minesweaper,
+    path: MenuItems.GraphManager,
   },
 ];
 
@@ -32,22 +30,20 @@ class Router extends React.Component<{}, {}> {
   public render() {
     return (
       <ConnectedRouter history={history}>
-        <ErrorBoundary>
-          <Suspense fallback={<div>Loading...</div>}>
-            <Switch>
-              <Route exact path="/" render={() => <Redirect to={defaultPath} />} />
-              {routes.map((route) => (
-                <Route
-                  path={route.path}
-                  component={route.component}
-                  key={route.path}
-                  exact={route.exact}
-                />
-              ))}
-              <Route component={() => <div>Route doesnt exsist</div>} />
-            </Switch>
-          </Suspense>
-        </ErrorBoundary>
+        <Suspense fallback={<div>Loading...</div>}>
+          <Switch>
+            <Route exact path="/" render={() => <Redirect to={defaultPath} />} />
+            {routes.map((route) => (
+              <Route
+                path={route.path}
+                component={route.component}
+                key={route.path}
+                exact={route.exact}
+              />
+            ))}
+            <Route component={() => <div>Route doesnt exsist</div>} />
+          </Switch>
+        </Suspense>
       </ConnectedRouter>
     );
   }
