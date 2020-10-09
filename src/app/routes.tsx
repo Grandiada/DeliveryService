@@ -1,8 +1,6 @@
-import { createBrowserHistory } from 'history';
 import React, { lazy, Suspense } from 'react';
-import { Redirect, Route, Switch } from 'react-router-dom';
+import { Redirect, Route, Switch, MemoryRouter } from 'react-router-dom';
 
-import { ConnectedRouter } from 'connected-react-router';
 
 export enum MenuItems {
   GraphManager = '/graph-manager',
@@ -24,12 +22,10 @@ const routes: IRoute[] = [
   },
 ];
 
-export const history = createBrowserHistory();
-
 class Router extends React.Component<{}, {}> {
   public render() {
     return (
-      <ConnectedRouter history={history}>
+      <MemoryRouter>
         <Suspense fallback={<div>Loading...</div>}>
           <Switch>
             <Route exact path="/" render={() => <Redirect to={defaultPath} />} />
@@ -44,7 +40,7 @@ class Router extends React.Component<{}, {}> {
             <Route component={() => <div>Route doesnt exsist</div>} />
           </Switch>
         </Suspense>
-      </ConnectedRouter>
+      </MemoryRouter>
     );
   }
 }
