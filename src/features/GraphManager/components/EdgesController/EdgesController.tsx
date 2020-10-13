@@ -42,7 +42,7 @@ export default class EdgesController extends React.Component<IEdgesControllerPro
                             <Option value={o} key={o}>{o}</Option>
                         )}
                     </Select>
-                    <ArrowRightOutlined />
+                    <ArrowRightOutlined className={'edges-controller_arrow'} />
                     <Select className={'edges-controller_target-select'}
                         value={this.state.targetSelectedNode}
                         onChange={(value) => { this.setState({ targetSelectedNode: value }); }}>

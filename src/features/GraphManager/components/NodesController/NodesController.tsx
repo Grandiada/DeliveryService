@@ -60,7 +60,7 @@ export default class NodesController extends React.PureComponent<INodesControlle
                         <Tag
                             className="edit-tag"
                             key={nodeKey}
-                            closable={index !== 0}
+                            closable={true}
                             onClose={() => this.handleClose(nodeKey)}
                         >
                             <span
@@ -100,7 +100,7 @@ export default class NodesController extends React.PureComponent<INodesControlle
                 )}
                 {!this.state.inputVisible && (
                     <Tag className="site-tag-plus" onClick={this.showInput}>
-                        <PlusOutlined /> New Tag
+                        <PlusOutlined /> Add node
                     </Tag>
                 )}
             </div>

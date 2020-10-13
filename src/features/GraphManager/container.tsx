@@ -6,6 +6,9 @@ import NodesController from './components/NodesController/NodesController';
 import EdgesController from './components/EdgesController/EdgesController';
 
 import CytoscapeComponent from 'react-cytoscapejs';
+import RouteCalculator from './components/RouteCalculator/RouteCalculator';
+import RouteCounter from './components/RouteCounter/RouteCounter';
+import CenteredText from '../../common/components/CenteredText/CenteredText';
 
 export interface IGraphManagerState {
     graph: Graph;
@@ -134,65 +137,76 @@ export default class GraphManager extends React.Component<{}, IGraphManagerState
         ...Object.keys(this.state.graph).map((item) => { return { data: { id: item, label: item } } })]
 
         return (
-            <div style={{ background: 'cadetblue' }}>
+            <div style={{ background: 'lightsteelblue', height: '100%' }}>
                 <Row>
-                    <Col flex="300px" style={{ borderRight: '2px solid black', minHeight: '400px' }}>
+                    <Col flex="300px" style={{ borderRight: '2px solid black', height: '700px' }}>
                         <Row>
                             <Divider orientation="center">Nodes</Divider>
-
                             <NodesController
                                 nodeKeys={Object.keys(this.state.graph)}
                                 add={this.AddGraphNode}
                                 remove={this.RemoveGraphNode}
                                 edit={this.RenameGraphNode}
-                            /></Row >
+                            />
+                        </Row >
                         <Row>
                             <Divider orientation="center">Edges</Divider>
                             {Object.keys(this.state.graph).length > 1 &&
-                                < EdgesController
+                                <EdgesController
                                     removeEdge={this.RemoveEdge}
                                     graph={this.state.graph}
                                     addEdge={this.AddEdge}
-                                    nodeKeys={Object.keys(this.state.graph)} /> || <span>Choice at least 2 nodes</span>}
+                                    nodeKeys={Object.keys(this.state.graph)} /> || <CenteredText size="sm" text='Add at least 2 nodes' />}
                         </Row >
                     </Col>
                     <Col flex="auto">
-                        < CytoscapeComponent
-                            pan={{ x: 100, y: 200 }}
-                            elements={elements} style={{ width: '100%', height: '100%' }}
-                            layout={{ name: 'circle', directed: true }}
-                            cy={this.handleCy}
-                            stylesheet={[
-                                {
-                                    selector: 'node',
-                                    style: {
-                                        'content': 'data(id)',
-                                    }
-                                },
-                                {
-                                    selector: 'edge',
-                                    style: {
-                                        'width': '5px',
-                                        'curve-style': 'bezier',
-                                        'target-arrow-shape': 'triangle'
-                                    }
-                                },
-                                {
-                                    "selector": "edge[label]",
-                                    "style": {
-                                        "label": "data(label)",
-                                        "width": 3
-                                    }
-                                },
-                            ]}
-                        />
+                        {Object.keys(this.state.graph).length !== 0 &&
+                            <CytoscapeComponent
+                                pan={{ x: 100, y: 200 }}
+                                elements={elements} style={{ width: '100%', height: '100%' }}
+                                layout={{ name: 'circle', directed: true }}
+                                cy={this.handleCy}
+                                stylesheet={[
+                                    {
+                                        selector: 'node',
+                                        style: {
+                                            'content': 'data(id)',
+                                        }
+                                    },
+                                    {
+                                        selector: 'edge',
+                                        style: {
+                                            'width': '5px',
+                                            'curve-style': 'bezier',
+                                            'target-arrow-shape': 'triangle'
+                                        }
+                                    },
+                                    {
+                                        "selector": "edge[label]",
+                                        "style": {
+                                            "label": "data(label)",
+                                            "width": 3
+                                        }
+                                    },
+                                ]}
+                            /> || <CenteredText size="lg" text='Add nodes to see graph representation' />
+                        }
                     </Col>
                 </Row>
 
                 <Divider orientation="center">Calculation</Divider>
                 <Row justify="space-around">
-                    <Col span={8} style={{ background: 'orange' }}>col-4</Col>
-                    <Col span={8} style={{ background: 'blue' }}>col-4</Col>
+                    <Col span={8}>
+                        <RouteCalculator
+                            graph={this.state.graph}
+                            nodes={Object.keys(this.state.graph)}
+                        />
+                    </Col>
+                    <Col span={8}>
+                        <RouteCounter
+                            graph={this.state.graph}
+                            nodes={Object.keys(this.state.graph)} />
+                    </Col>
                 </Row>
             </div>
         );
