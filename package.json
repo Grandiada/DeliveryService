@@ -17,6 +17,7 @@
     "@types/jest": "^25.2.3",
     "@types/prop-types": "^15.7.3",
     "@types/react": "^16.9.51",
+    "@types/react-cytoscapejs": "^1.1.1",
     "@types/react-dom": "^16.9.7",
     "@types/react-redux": "^7.1.7",
     "@types/react-router-dom": "^5.1.6",
@@ -42,6 +43,7 @@
     "webpack-dev-server": "^3.10.3"
   },
   "dependencies": {
+    "@ant-design/icons": "^4.2.2",
     "@reduxjs/toolkit": "^1.4.0",
     "antd": "^4.6.6",
     "axios": "^0.20.0",
@@ -50,6 +52,7 @@
     "cytoscape": "^3.16.2",
     "react": "^16.13.1",
     "react-app-polyfill": "^1.0.6",
+    "react-cytoscapejs": "^1.2.1",
     "react-dom": "^16.13.1",
     "react-i18next": "^11.7.3",
     "react-logger": "^1.1.0",

@@ -59,7 +59,7 @@ module.exports = (env, options) => {
                 reloadAll: true,
               },
             },
-            { loader: 'css-loader', options: { modules: true } },
+            { loader: 'css-loader', options: { modules: false } },
             'sass-loader',
           ],
         },

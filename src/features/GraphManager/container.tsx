@@ -3,6 +3,9 @@ import { Graph } from './models/Graph';
 import { Button, Col, Divider, notification, Row, Space } from 'antd';
 import { present } from '../../common/helpers/lang';
 import NodesController from './components/NodesController/NodesController';
+import EdgesController from './components/EdgesController/EdgesController';
+
+import CytoscapeComponent from 'react-cytoscapejs';
 
 export interface IGraphManagerState {
     graph: Graph;
@@ -18,6 +21,9 @@ export default class GraphManager extends React.Component<{}, IGraphManagerState
     }
 
     private AddGraphNode = (nodeKey: string) => {
+        if (!nodeKey)
+            return;
+
         if (this.state.graph[nodeKey])
             notification.error({ message: 'Node already added' })
         else
@@ -74,8 +80,16 @@ export default class GraphManager extends React.Component<{}, IGraphManagerState
 
 
     private AddEdge = (sourceKey: string, targetKey: string, cost: number) => {
+        if (sourceKey === targetKey) {
+            notification.error({ message: 'Source and target should be different' })
+            return;
+        }
+
         if (!this.state.graph[sourceKey] || !this.state.graph[targetKey])
             notification.error({ message: 'Something went wrong' })
+        else if (this.state.graph[sourceKey]?.neighbors.find(i => i.key === targetKey)) {
+            notification.error({ message: 'Edge already exist' })
+        }
         else {
             const copy = {
                 ...this.state.graph
@@ -94,19 +108,35 @@ export default class GraphManager extends React.Component<{}, IGraphManagerState
             const copy = {
                 ...this.state.graph
             };
-            present(copy[sourceKey]).neighbors.filter(i => i.key === targetKey)
+            present(copy[sourceKey]).neighbors = present(copy[sourceKey]).neighbors.filter(i => i.key !== targetKey)
+
             this.setState({
                 graph: copy
             })
         }
     }
+    private handleCy = (cy: cytoscape.Core) => {
+        const refreshLayout = () => setTimeout(() => {
+            cy.layout({ name: 'circle', directed: true }).run()
+        }, 100);
+
+        cy.on('add remove', () => {
+            refreshLayout();
+        });
+    }
 
     public render() {
+
+        const elements = [...Object.keys(this.state.graph).reduce(
+            (previousValue, currentValue, index, array) =>
+                [...previousValue, ...present(this.state.graph[currentValue]).
+                    neighbors.map((item) => { return { data: { source: currentValue, target: item.key, label: item.cost }, classes: 'autorotate' }; })], []),
+        ...Object.keys(this.state.graph).map((item) => { return { data: { id: item, label: item } } })]
+
         return (
-            <>
-                <Divider orientation="center">Configuration</Divider>
+            <div style={{ background: 'cadetblue' }}>
                 <Row>
-                    <Col flex="300px" style={{ background: 'red' }}>
+                    <Col flex="300px" style={{ borderRight: '2px solid black', minHeight: '400px' }}>
                         <Row>
                             <Divider orientation="center">Nodes</Divider>
 
@@ -117,11 +147,46 @@ export default class GraphManager extends React.Component<{}, IGraphManagerState
                                 edit={this.RenameGraphNode}
                             /></Row >
                         <Row>
-                            <Divider orientation="center">Nodes</Divider>
-                            Edges
+                            <Divider orientation="center">Edges</Divider>
+                            {Object.keys(this.state.graph).length > 1 &&
+                                < EdgesController
+                                    removeEdge={this.RemoveEdge}
+                                    graph={this.state.graph}
+                                    addEdge={this.AddEdge}
+                                    nodeKeys={Object.keys(this.state.graph)} /> || <span>Choice at least 2 nodes</span>}
                         </Row >
                     </Col>
-                    <Col flex="auto" style={{ background: 'blue' }}>Fill Rest</Col>
+                    <Col flex="auto">
+                        < CytoscapeComponent
+                            pan={{ x: 100, y: 200 }}
+                            elements={elements} style={{ width: '100%', height: '100%' }}
+                            layout={{ name: 'circle', directed: true }}
+                            cy={this.handleCy}
+                            stylesheet={[
+                                {
+                                    selector: 'node',
+                                    style: {
+                                        'content': 'data(id)',
+                                    }
+                                },
+                                {
+                                    selector: 'edge',
+                                    style: {
+                                        'width': '5px',
+                                        'curve-style': 'bezier',
+                                        'target-arrow-shape': 'triangle'
+                                    }
+                                },
+                                {
+                                    "selector": "edge[label]",
+                                    "style": {
+                                        "label": "data(label)",
+                                        "width": 3
+                                    }
+                                },
+                            ]}
+                        />
+                    </Col>
                 </Row>
 
                 <Divider orientation="center">Calculation</Divider>
@@ -129,7 +194,7 @@ export default class GraphManager extends React.Component<{}, IGraphManagerState
                     <Col span={8} style={{ background: 'orange' }}>col-4</Col>
                     <Col span={8} style={{ background: 'blue' }}>col-4</Col>
                 </Row>
-            </>
+            </div>
         );
     }
 }
